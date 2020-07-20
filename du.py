@@ -87,8 +87,17 @@ if __name__ == '__main__':
         const=1024**3,
         help='set the block size as 1 gigabyte'
     )
-    parser.add_argument('-h', action='store_true', help='format the response to be human readable')
-    parser.add_argument('path', default='.', nargs='?', help='the parent path to be analyzed')
+    parser.add_argument(
+        '-h',
+        action='store_true',
+        help='format the response to be human readable'
+    )
+    parser.add_argument(
+        'path',
+        default='.',
+        nargs='?',
+        help='the parent path to be analyzed'
+    )
 
     args = parser.parse_args()
     if args.block_size is None:
