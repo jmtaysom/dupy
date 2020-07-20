@@ -17,7 +17,8 @@ def format_file_size(p, block_size, h=''):
     path = Path(p)
     output = []
     for f in find_children(path):
-        output.append(f'{str(int(children_size(f)/block_size))+h:<10} {f.absolute()}')
+        size = int(round(children_size(f)/block_size))
+        output.append(f'{str(size)+h:<10} {f.absolute()}')
     return output
 
 def children_size(p):
