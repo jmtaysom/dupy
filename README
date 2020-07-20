@@ -23,5 +23,9 @@ optional arguments:
 
 ```
 
+#### Usage Example
+
+```python3 du.py -m -h ./data```
+
 ### Testing
 Run `python3 test_du.py` to execute the five builtin tests
