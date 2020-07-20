@@ -1,7 +1,78 @@
 from pathlib import Path
-from os.path import getsize
+from os.path import getsize, join
+from os import walk
 
-path = Path('.')
-for f in path.iterdir():
-    print(f'{getsize(f):<10} {f.absolute()}')
 
+def format_file_size(p, block_size, h=''):
+    """
+    Iterate through all sub directories and format the file size
+    for all children in each directory. Opperates in similar fashion
+    to du --apparent-size
+    :param p: filepath like object
+    :param block_size: the size of the block either as an int
+    :param h: If it is meant to be human readable append the unit of
+              measurement.
+    :return: A list of all the formated lines
+    """
+    path = Path(p)
+    output = []
+    for f in find_children(path):
+        output.append(f'{str(int(children_size(f)/block_size))+h:<10} {f.absolute()}')
+    return output
+
+def children_size(p):
+    """
+    For a given directory find the summed file size of all files in
+    all sub directories
+    :param p: filepath like object
+    :return: total file size in Bytes
+    """
+    size = 0
+    for root, dirs, files in walk(p):
+        for f in files:
+            size += getsize(join(root, f))
+    return size
+
+
+def find_children(p, children=None):
+    """
+    Take a given file path and find all sub directories recursively
+    :param p: filepath like object
+    :param children: a list of subdirectories that will be searched next
+    :return: the original directory and all sub directories in a list
+    """
+    if children is None:
+        children = []
+    if p.is_dir():
+        children.append(p)
+        for child in p.iterdir():
+            find_children(child, children=children)
+    return children
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='estimate file space usage',
+        conflict_handler='resolve'
+    )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-b', dest='block_size', action="store_const", const=1)
+    group.add_argument('-k', dest='block_size', action="store_const", const=1024)
+    group.add_argument('-m', dest='block_size', action="store_const", const=1024**2)
+    group.add_argument('-g', dest='block_size', action="store_const", const=1024**3)
+    parser.add_argument('-h', action='store_true')
+    parser.add_argument('path', default='.', nargs='?')
+
+    args = parser.parse_args()
+    if args.block_size is None:
+        args.block_size = 1024
+    readable_dict = {1: 'B', 1024: 'K', 1024**2: 'M', 1024**3: 'G'}
+    if args.h:
+        args.h = readable_dict[args.block_size]
+    else:
+        args.h = ''
+    output = format_file_size(args.path, args.block_size, args.h)
+    for line in output:
+        print(line)
