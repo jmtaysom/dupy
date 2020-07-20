@@ -59,12 +59,36 @@ if __name__ == '__main__':
         conflict_handler='resolve'
     )
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-b', dest='block_size', action="store_const", const=1)
-    group.add_argument('-k', dest='block_size', action="store_const", const=1024)
-    group.add_argument('-m', dest='block_size', action="store_const", const=1024**2)
-    group.add_argument('-g', dest='block_size', action="store_const", const=1024**3)
-    parser.add_argument('-h', action='store_true')
-    parser.add_argument('path', default='.', nargs='?')
+    group.add_argument(
+        '-b',
+        dest='block_size',
+        action="store_const",
+        const=1,
+        help='set the block size as 1 byte'
+    )
+    group.add_argument(
+        '-k',
+        dest='block_size',
+        action="store_const",
+        const=1024,
+        help='set the block size as 1 kilobyte'
+    )
+    group.add_argument(
+        '-m',
+        dest='block_size',
+        action="store_const",
+        const=1024**2,
+        help='set the block size as 1 megabyte'
+    )
+    group.add_argument(
+        '-g',
+        dest='block_size',
+        action="store_const",
+        const=1024**3,
+        help='set the block size as 1 gigabyte'
+    )
+    parser.add_argument('-h', action='store_true', help='format the response to be human readable')
+    parser.add_argument('path', default='.', nargs='?', help='the parent path to be analyzed')
 
     args = parser.parse_args()
     if args.block_size is None:
